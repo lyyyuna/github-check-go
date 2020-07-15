@@ -17,15 +17,20 @@ type CheckClient struct {
 	CommitSHA string
 	Repo      string
 	Owner     string
+	PrNum     string
+	Title     string
 	Timeout   int
 }
 
 type CIResult struct {
-	Repo     string `json:"repo"`
-	Owner    string `json:"owner"`
-	Total    int    `json:"total"`
-	Success  int    `json:"success"`
-	Complete int    `json:"complete"`
+	Repo      string `json:"repo"`
+	Owner     string `json:"owner"`
+	Total     int    `json:"total"`
+	Success   int    `json:"success"`
+	Complete  int    `json:"complete"`
+	PrNum     string `json:"pr"`
+	Title     string `json:"title"`
+	CommitSHA string `json:"sha"`
 }
 
 func NewClient(path string) (*CheckClient, error) {
@@ -47,6 +52,8 @@ func NewClient(path string) (*CheckClient, error) {
 		Owner:     viper.GetString("owner"),
 		Repo:      viper.GetString("repo"),
 		Timeout:   viper.GetInt("timeout"),
+		PrNum:     viper.GetString("pr"),
+		Title:     viper.GetString("title"),
 	}, nil
 }
 
@@ -88,11 +95,14 @@ func (c *CheckClient) check() (*CIResult, error) {
 	}
 
 	return &CIResult{
-		Repo:     c.Repo,
-		Owner:    c.Owner,
-		Total:    total,
-		Success:  successCount,
-		Complete: total - waitingCount}, nil
+		Repo:      c.Repo,
+		Owner:     c.Owner,
+		Total:     total,
+		Success:   successCount,
+		Complete:  total - waitingCount,
+		Title:     c.Title,
+		PrNum:     c.PrNum,
+		CommitSHA: c.CommitSHA}, nil
 }
 
 func (c *CheckClient) QueryLoop() *CIResult {
@@ -112,7 +122,7 @@ func (c *CheckClient) QueryLoop() *CIResult {
 		if r.Complete == r.Total {
 			return r
 		}
-		time.Sleep(time.Second * 10)
+		time.Sleep(time.Second * 15)
 
 	}
 

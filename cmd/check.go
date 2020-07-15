@@ -32,15 +32,19 @@ var (
 	commitSHA string
 	owner     string
 	repo      string
+	prNum     string
+	prTitle   string
 	timeout   int
 )
 
 func init() {
-	checkCmd.Flags().StringVarP(&token, "token", "t", "", "specify github token file path")
+	checkCmd.Flags().StringVarP(&token, "token", "t", "/etc/github/oauth", "specify github token file path")
 	checkCmd.Flags().StringVarP(&commitSHA, "commit", "c", "", "specify the commit sha")
 	checkCmd.Flags().StringVarP(&owner, "owner", "o", "", "specify the owner name")
 	checkCmd.Flags().StringVarP(&repo, "repo", "r", "", "specify the repo name")
-	checkCmd.Flags().IntVarP(&timeout, "timeout", "", 60, "specify the timeout")
+	checkCmd.Flags().StringVarP(&prNum, "pr", "", "", "specify the pr num")
+	checkCmd.Flags().StringVarP(&prTitle, "title", "", "", "specify the pr title")
+	checkCmd.Flags().IntVarP(&timeout, "timeout", "", 600, "specify the timeout")
 	viper.BindPFlags(checkCmd.Flags())
 	rootCmd.AddCommand(checkCmd)
 }
