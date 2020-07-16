@@ -61,6 +61,7 @@ func (c *CheckClient) check() (*CIResult, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
+	// include github status
 	listOption := &github.ListOptions{PerPage: 20}
 	var statuses []*github.RepoStatus
 	for {
@@ -96,6 +97,24 @@ func (c *CheckClient) check() (*CIResult, error) {
 		}
 	}
 
+	// include github checks
+	ctx2, cancel2 := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel2()
+	listCheckOption := &github.ListCheckRunsOptions{}
+	listres, _, err := c.C.Checks.ListCheckRunsForRef(ctx2, c.Owner, c.Repo, c.CommitSHA, listCheckOption)
+	if err != nil {
+		return nil, err
+	}
+	total += 1
+
+	for _, checkrun := range listres.CheckRuns {
+		if checkrun.GetStatus() != "completed" {
+			waitingCount += 1
+		} else if checkrun.GetConclusion() == "success" {
+			successCount += 1
+		}
+	}
+
 	return &CIResult{
 		Repo:      c.Repo,
 		Owner:     c.Owner,
@@ -125,7 +144,7 @@ func (c *CheckClient) QueryLoop() *CIResult {
 		if r.Complete == r.Total {
 			return r
 		}
-		time.Sleep(time.Second * 15)
+		time.Sleep(time.Second * 20)
 
 	}
 
