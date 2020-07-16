@@ -68,6 +68,8 @@ func (c *CheckClient) check() (*CIResult, error) {
 		if err != nil {
 			return nil, err
 		}
+		log.Printf("github api result, the next page is %v", r.NextPage)
+
 		statuses = append(statuses, pagedStatus...)
 		if r.NextPage == 0 {
 			break
@@ -118,6 +120,7 @@ func (c *CheckClient) QueryLoop() *CIResult {
 			log.Fatal(err)
 			return nil
 		}
+		log.Printf("check result: %v", r)
 
 		if r.Complete == r.Total {
 			return r
