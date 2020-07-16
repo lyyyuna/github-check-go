@@ -42,7 +42,7 @@ func NewClient(path string) (*CheckClient, error) {
 	ts := oauth2.StaticTokenSource(
 		&oauth2.Token{AccessToken: token},
 	)
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	tc := oauth2.NewClient(ctx, ts)
 
@@ -58,7 +58,7 @@ func NewClient(path string) (*CheckClient, error) {
 }
 
 func (c *CheckClient) check() (*CIResult, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
 	// include github status
@@ -98,7 +98,7 @@ func (c *CheckClient) check() (*CIResult, error) {
 	}
 
 	// include github checks
-	ctx2, cancel2 := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx2, cancel2 := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel2()
 	listCheckOption := &github.ListCheckRunsOptions{}
 	listres, _, err := c.C.Checks.ListCheckRunsForRef(ctx2, c.Owner, c.Repo, c.CommitSHA, listCheckOption)
